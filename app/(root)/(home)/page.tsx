@@ -1,4 +1,5 @@
 "use client";
+
 import MeetingTypeList from "@/components/MeetingTypeList";
 import React, { useState } from "react";
 
