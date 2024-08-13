@@ -1,12 +1,5 @@
 import React, { ReactNode } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -16,10 +9,12 @@ interface MeetingModalProps {
   onClose: () => void;
   title: string;
   className?: string;
-  Children?: ReactNode;
+  children?: ReactNode;
   handelClick?: () => void;
   buttonText?: string;
+  instantMeeting?: boolean;
   image?: string;
+  buttonClassName?: string;
   buttonIcon?: string;
 }
 
@@ -28,10 +23,12 @@ const MeetingModal = ({
   onClose,
   title,
   className,
-  Children,
+  children,
   handelClick,
   buttonText,
+  instantMeeting,
   image,
+  buttonClassName,
   buttonIcon,
 }: MeetingModalProps) => {
   return (
@@ -46,7 +43,7 @@ const MeetingModal = ({
           <h1 className={cn("text-3xl font-bold leading-[42px]", className)}>
             {title}
           </h1>
-          {Children}
+          {children}
           <Button
             className="bg-blue-1 focus-visible:ring-0 focus-visible:ring-offset-0"
             onClick={handelClick}
