@@ -1,7 +1,6 @@
 "use client";
 import MeetingModal from "@/components/MeetingModal";
 import { useState } from "react";
-import React from "react";
 import HomeCard from "./HomeCard";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -9,6 +8,14 @@ import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import ReactDatePicker from "react-datepicker";
+import Loader from "./Loader";
+import { Input } from "./ui/input";
+
+const initialValues = {
+  dateTime: new Date(),
+  description: "",
+  link: "",
+};
 
 const MeetingTypeList = () => {
   const router = useRouter();
@@ -17,11 +24,7 @@ const MeetingTypeList = () => {
   >();
   const { user } = useUser();
   const client = useStreamVideoClient();
-  const [values, setValues] = useState({
-    dateTime: new Date(),
-    description: "",
-    link: "",
-  });
+  const [values, setValues] = useState(initialValues);
 
   const [callDetails, setCallDetails] = useState<Call>();
   const { toast } = useToast();
@@ -63,6 +66,8 @@ const MeetingTypeList = () => {
       });
     }
   };
+  if (!client || !user) return <Loader />;
+  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`;
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
       <HomeCard
@@ -83,7 +88,7 @@ const MeetingTypeList = () => {
         img="/icons/recordings.svg"
         title="View Recordings"
         description="Check out your recordings"
-        hadelClick={() => setMeetingState("isJoiningMeeting")}
+        hadelClick={() => router.push("/recordings")}
         className="bg-purple-1"
       />
       <HomeCard
@@ -134,16 +139,30 @@ const MeetingTypeList = () => {
           title="Meeting created"
           className="text-center"
           handelClick={() => {
-            // navigator.clipboard.writeText(meetingLink)
-            // toast({
-            //   title: "Meeting link copied",
-            // });
+            navigator.clipboard.writeText(meetingLink);
+            toast({
+              title: "Meeting link copied",
+            });
           }}
           image="/icons/checked.svg"
           buttonIcon="/icons/copy.svg"
           buttonText="Copy Meeting Link"
         />
       )}
+      <MeetingModal
+        isOpen={meetingState === "isJoiningMeeting"}
+        onClose={() => setMeetingState(undefined)}
+        title="Type the link here"
+        className="text-center"
+        buttonText="Join Meeting"
+        handelClick={() => router.push(values.link)}
+      >
+        <Input
+          placeholder="Meeting link"
+          onChange={(e) => setValues({ ...values, link: e.target.value })}
+          className="border-none bg-dark-3 focus-visible:ring-0 focus-visible:ring-offset-0"
+        />
+      </MeetingModal>
       <MeetingModal
         isOpen={meetingState === "isInstantMeeting"}
         onClose={() => setMeetingState(undefined)}
